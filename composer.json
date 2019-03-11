@@ -1,0 +1,4 @@
+{
+    "name": "sglusnevs/slick-grid-frozen",
+    "description": "My very own fork of SlickGrid, featuring frozen rows and columns from https://github.com/JLynch7/SlickGrid/tree/2.0-frozenRowsAndColumns to make it available for composer via Packagist"
+}
