@@ -4,7 +4,7 @@
    * Right now, it's hooked up to load Hackernews stories, but can
    * easily be extended to support any JSONP-compatible backend that accepts paging parameters.
    */
-  function AjaxModel(url, pagesize, stoken) {
+  function AjaxModel(url, pagesize, request_extra) {
     // private
     var PAGESIZE = (pagesize? pagesize: 100);
     //var data = {length: 0};
@@ -79,12 +79,13 @@
         return;
       }
 
-      var request = { 
+      var request_data = { 
         'q': searchstr,
-        'stoken': stoken,
         'start': (fromPage * PAGESIZE),
         'limit': (((toPage - fromPage) * PAGESIZE) + PAGESIZE),
       };
+
+      var request = Object.assign({}, request_data, request_extra);
 
       if (sortcol != null) {
           request['sort'] =  sortcol;
