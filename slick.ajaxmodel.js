@@ -86,7 +86,7 @@
         'limit': (((toPage - fromPage) * PAGESIZE) + PAGESIZE),
       };
 
-      var request = Object.assign({}, request_data, request_extra);
+      var request = $.extend({}, request_data, request_extra);
 
       if (sortcol != null) {
           request['sort'] =  sortcol;
@@ -110,7 +110,7 @@
           cache: true,
           success: onSuccess,
           error: function (xhr) {
-            onError.notify([ xhr, fromPage, toPage ])
+            onError.notify(xhr);
           }
         });
         req.fromPage = fromPage;
@@ -120,7 +120,6 @@
 
     function onSuccess(resp) {
       var from = resp.request.start, to = from + resp.results.length;
-      // data.length = Math.min(parseInt(resp.hits), 1000); // limitation of the API
       data.length = resp.hits;
       // data_length = resp.hits;  // CHANGE TO THIS IF plan for more than 30K records
 
