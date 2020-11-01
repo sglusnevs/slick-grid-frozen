@@ -19,6 +19,7 @@
     // events
     var onDataLoading = new Slick.Event();
     var onDataLoaded = new Slick.Event();
+    var onError = new Slick.Event();
 
 
     function init() {
@@ -109,20 +110,12 @@
           cache: true,
           success: onSuccess,
           error: function (xhr) {
-            onError(xhr, fromPage, toPage)
+            onError.notify([ xhr, fromPage, toPage ])
           }
         });
         req.fromPage = fromPage;
         req.toPage = toPage;
       }, 50);
-    }
-
-
-    function onError(xhr, fromPage, toPage) {
-      // abort means we are scrolling too fast (due to timeout on scroll event)
-      if ('abort' != xhr.statusText) {
-        alert("error loading pages " + fromPage + " to " + toPage);
-      }
     }
 
     function onSuccess(resp) {
@@ -188,7 +181,8 @@
 
       // events
       "onDataLoading": onDataLoading,
-      "onDataLoaded": onDataLoaded
+      "onDataLoaded": onDataLoaded,
+      "onError": onError
     };
   }
 
