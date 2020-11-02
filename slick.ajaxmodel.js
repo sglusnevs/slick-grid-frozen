@@ -109,8 +109,12 @@
           callbackParameter: "callback",
           cache: true,
           success: onSuccess,
-          error: function (xhr) {
-            onError.notify(xhr);
+          error: function (xhr, status, error) {
+            // do not notify on abort, this happens when next request is made before
+            // previous one is finished, like typping search filter and suddenly scroll
+            if (xhr.statusText != 'abort') {
+                onError.notify({'status': xhr.status, 'statusText': xhr.statusText});
+            }
           }
         });
         req.fromPage = fromPage;
