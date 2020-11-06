@@ -4,7 +4,7 @@
    * Right now, it's hooked up to load Hackernews stories, but can
    * easily be extended to support any JSONP-compatible backend that accepts paging parameters.
    */
-  function RemoteModel(url, pagesize, stoken) {
+  function RemoteModel(url, pagesize, request_extra) {
     // private
     var PAGESIZE = pagesize;
     // var data = {length: 0};
@@ -20,6 +20,7 @@
     // events
     var onDataLoading = new Slick.Event();
     var onDataLoaded = new Slick.Event();
+    var onError = new Slick.Event();
 
 
     function init() {
@@ -97,10 +98,11 @@
         return;
       }
 
-      var request = { 
+      var request_data = { 
         'q': searchstr,
-        'stoken': stoken,
       };
+
+      var request = $.extend({}, request_data, request_extra);
 
       if (sortcol != null) {
           request['sort'] =  sortcol;
@@ -125,8 +127,12 @@
           callbackParameter: "callback",
           cache: true,
           success: onSuccess,
-          error: function () {
-            onError(fromPage, toPage)
+          error: function (xhr, status, error) {
+            // do not notify on abort, this happens when next request is made before
+            // previous one is finished, like typping search filter and suddenly scroll
+            if (xhr.statusText != 'abort') {
+                onError.notify({'status': xhr.status, 'statusText': xhr.statusText});
+            }
           }
         });
         req.fromPage = fromPage;
@@ -186,13 +192,9 @@
     }
 
 
-    function onError(fromPage, toPage) {
-      alert("error loading pages " + fromPage + " to " + toPage);
-    }
-
     function onSuccess(resp) {
 
-      var numRows = resp.text.length;
+      var numRows = resp.hits;
 
       if ('error' == resp.status) {
         numRows = 0;
@@ -201,7 +203,7 @@
       var from = 0, to = from + numRows;
 
       for (var i = 0; i < numRows; i++) {
-        var item = resp.text[i];
+        var item = resp.results[i];
 
         // Old IE versions can't parse ISO dates, so change to universally-supported format.
         // item.create_ts = item.create_ts.replace(/^(\d+)-(\d+)-(\d+)T(\d+:\d+:\d+)Z$/, "$2/$3/$1 $4 UTC"); 
@@ -266,7 +268,8 @@
 
       // events
       "onDataLoading": onDataLoading,
-      "onDataLoaded": onDataLoaded
+      "onDataLoaded": onDataLoaded,
+      "onError": onError
     };
   }
 
