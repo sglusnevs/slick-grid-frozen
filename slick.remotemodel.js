@@ -50,6 +50,16 @@
       filter = filterFn;
     }
 
+    function sortView() {
+
+      data.sort(function(a, b){
+        x = '' + a[sortcol];
+        y = '' + b[sortcol];
+        return -1 * sortdir * x.localeCompare(y);
+      });
+
+      onDataLoaded.notify({from:0, to: data.length});
+    }
 
     function filterView() {
 
@@ -237,7 +247,7 @@
     function setSort(column, dir) {
       sortcol = column;
       sortdir = dir;
-      clear();
+      //clear();
     }
 
     function setSearch(str) {
@@ -261,6 +271,7 @@
       "setSearch": setSearch,
       "setFilter": setFilter,
       "filterView": filterView,
+      "sortView": sortView,
       "addRowsLocal": addRowsLocal,
       "deleteRowLocalById": deleteRowLocalById,
       "deleteRowLocalByIdx": deleteRowLocalByIdx,
